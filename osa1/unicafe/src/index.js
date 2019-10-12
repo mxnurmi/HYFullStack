@@ -2,8 +2,6 @@ import React, { useState } from 'react'
 import ReactDOM from 'react-dom'
 import { constants } from 'fs';
 
-
-
 const Header = ({ text }) => <h1>{text}</h1>
 
 const Value = ({ text, value }) => <tbody><tr><td>{text}</td><td>{value}</td></tr></tbody>
