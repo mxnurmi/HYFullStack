@@ -1,13 +1,30 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 
-/*
-const Country = ({ country}) => (
-  <div> {country.name} </div> 
-)
-*/
-
 const InfoCountry = ( {country} ) => {
+  const [ weatherData, setWeatherData ] = useState([])
+  const [ weatherPic, setWeatherPic] = useState("https://assets.weatherstack.com/images/wsymbols01_png_64/wsymbol_0004_black_low_cloud.png")
+
+  const query = country.name
+
+  const access_key = process.env.REACT_APP_API_KEY
+
+  useEffect(() => {
+
+    axios
+      .get('http://api.weatherstack.com/current', {
+        params: {
+          access_key: access_key,
+          query: query
+        }
+      })
+      .then(response => {  
+        setWeatherData(response.data.current)
+        setWeatherPic(response.data.current.weather_icons)
+        console.log(response.data)
+          
+      })
+  }, []) 
 
   return(
     <div> 
@@ -21,19 +38,16 @@ const InfoCountry = ( {country} ) => {
         ))}
 
       <div><img src={country.flag} alt='flag' height="100" width="150"/></div>
+
+      <h3>Weather in {country.name}</h3>
+      <div><b>temperature:</b> {weatherData.temperature} ℃</div>
+      <div><img src={weatherPic} alt='weather' height="100" width="100"/></div>
+      <div><b>wind:</b> {weatherData.wind_speed} km/h, direction: {weatherData.wind_dir}</div>
     </div>
   )
 }
 
-const Countries = ( {countriesToShow} ) => {
-  const [ selectedCountries, setSelectedCountries ] = useState(countriesToShow)
-
-  const handleClick = ({ country }) => () => {
-    console.log('click')
-    setSelectedCountries({country})
-  }
-
-/*         {selectedCountries ? <InfoCountry country={selectedCountries} /> : null} */
+const Countries = ({ countriesToShow, handleClick }) => {
 
   if (countriesToShow.length === 0) {
     return('')
@@ -50,11 +64,10 @@ const Countries = ( {countriesToShow} ) => {
       <InfoCountry country={country} />
     )
   } else {
-    return(
+    return (
       <div>Too many matches, specify another filter</div>
     )
   }
-
 }
 
 const App = () => {
@@ -69,6 +82,9 @@ const App = () => {
       })
   }, []) 
 
+  const handleClick = (country) => () => {
+    setFilterName(country.name)
+  }
 
   const countriesToShow = filterName === '' 
   ? []
@@ -77,7 +93,7 @@ const App = () => {
   return(
     <div>
       find countries <input type="text" value={filterName} onChange={(event) => setFilterName(event.target.value)} />
-      <Countries countriesToShow={countriesToShow} />
+      <Countries countriesToShow={countriesToShow} handleClick={handleClick} />
     </div>
   )
 
