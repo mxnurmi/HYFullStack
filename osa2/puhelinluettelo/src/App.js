@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react'
-import axios from 'axios'
+import communicator from './services/persons'
 
-const Person = ( {person} ) => {
-  return (
-    <div>{person.name} {person.number}</div>
+const Person = ( {person, handleClick} ) => (
+  <div>{person.name} {person.number} {<button onClick={handleClick(person.id)}>delete</button>} </div>
   )
-}
 
-const Persons = ( {personsToShow} ) => (
+
+const Persons = ( {personsToShow, handleClick} ) => (
   personsToShow.map((person, i) =>
-    <Person key={person.name} person={person}/>
+  <div key={person.name}>
+    <Person person={person} handleClick={handleClick} /> 
+  </div>
   )
 )
 
@@ -27,29 +28,59 @@ const App = () => {
   const [ filterName, setFilterName] = useState ('')
 
   useEffect(() => {
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
-        setPersons(response.data)
+    communicator
+      .getPeople()
+        .then(personnel => {
+          setPersons(personnel)
       })
-  }, []) 
+  }, [])
 
-  const addNote = (event) => {
+  const addNote = event => {
     event.preventDefault()
     
     if (persons.find(person => person.name === newName)) {
-      window.alert(`${newName} is already added to phonebook`)
+      console.log('already in book')
+      
+      const person = persons.find(person => person.name === newName)
+      console.log(person)
+      
+      if (window.confirm(`${newName} is already added to phonebook. Do you want to update the phone number?`)) {
+        
+        const noteObject = {
+          name: newName,
+          number: newNumber
+        }
+
+        communicator
+          .edit(person.id, noteObject)
+            .then(response => {
+              setPersons(persons.map(personnel => personnel.name !== newName ? personnel : response))
+            })
+      }
     } else {
       const noteObject = {
         name: newName,
         number: newNumber
       }
-      console.log(noteObject)
-      
-      setPersons(persons.concat(noteObject))
-      setNewName('')
+      communicator 
+        .create(noteObject)
+          .then(returnedPerson => {
+            setPersons(persons.concat(returnedPerson))
+        })
     }
-  
+  }
+
+  const removePerson = (id) => () => {
+    const person = persons.find(person => person.id === id)
+
+    if (window.confirm(`Are you sure you want to delete ${person.name}?`))
+    communicator
+      .remove(id)
+        .then(returnedPerson => {
+          console.log(returnedPerson)
+          setPersons(persons.filter(personnel => personnel.id !== id))
+        })
+
   }
 
   const personsToShow = filterName === ''
@@ -74,7 +105,7 @@ const App = () => {
       </form>
       <h3>Numbers</h3>
 
-      <Persons personsToShow={personsToShow} />
+      <Persons personsToShow={personsToShow} handleClick={removePerson} />
 
     </div>
   )

@@ -24,7 +24,7 @@ const InfoCountry = ( {country} ) => {
         console.log(response.data)
           
       })
-  }, []) 
+  }, [access_key, query]) 
 
   return(
     <div> 
