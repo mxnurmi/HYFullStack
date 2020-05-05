@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import communicator from './services/persons'
+import './index.css'
 
 const Person = ( {person, handleClick} ) => (
   <div>{person.name} {person.number} {<button onClick={handleClick(person.id)}>delete</button>} </div>
@@ -20,13 +21,28 @@ const Filter = ( {filterName, handleChange}) => (
   </div>
 )
 
+const Notification = ({ message, classed }) => {
+
+  if (message === null || classed === null) {
+    return null
+  }
+  
+  return (
+    <div className={classed}>
+      {message}
+    </div>
+  )
+}
+
 
 const App = () => {
   const [ persons, setPersons] = useState([]) 
   const [ newName, setNewName ] = useState('')
-  const [ newNumber, setNewNumber ] = useState ('')
-  const [ filterName, setFilterName] = useState ('')
-
+  const [ newNumber, setNewNumber ] = useState('')
+  const [ filterName, setFilterName] = useState('')
+  const [ notification, setNotification ] = useState(null)
+  const [ notificationClass, setNotificationClass ] = useState(null)
+ 
   useEffect(() => {
     communicator
       .getPeople()
@@ -39,10 +55,8 @@ const App = () => {
     event.preventDefault()
     
     if (persons.find(person => person.name === newName)) {
-      console.log('already in book')
       
       const person = persons.find(person => person.name === newName)
-      console.log(person)
       
       if (window.confirm(`${newName} is already added to phonebook. Do you want to update the phone number?`)) {
         
@@ -54,8 +68,19 @@ const App = () => {
         communicator
           .edit(person.id, noteObject)
             .then(response => {
-              setPersons(persons.map(personnel => personnel.name !== newName ? personnel : response))
-            })
+              setPersons(persons.map(personnel => personnel.name !== newName ? personnel : response),
+              setNotification(`Updated ${newName}`),
+              setNotificationClass("good"))
+            }).catch(error => {
+              setNotification(`Information of ${newName} had been removed from the server!`)
+              setNotificationClass("bad")
+              setPersons(persons.filter(p => p.id !== person.id))
+              })
+
+            setTimeout(() => {
+              setNotification(null)
+              setNotificationClass(null)
+            }, 5000)
       }
     } else {
       const noteObject = {
@@ -67,20 +92,36 @@ const App = () => {
           .then(returnedPerson => {
             setPersons(persons.concat(returnedPerson))
         })
+      setNotification(`Added ${newName}`)
+      setNotificationClass("good")
+
+      setTimeout(() => {
+        setNotification(null)
+        setNotificationClass(null)
+      }, 5000)
     }
   }
 
   const removePerson = (id) => () => {
     const person = persons.find(person => person.id === id)
 
-    if (window.confirm(`Are you sure you want to delete ${person.name}?`))
-    communicator
-      .remove(id)
-        .then(returnedPerson => {
-          console.log(returnedPerson)
-          setPersons(persons.filter(personnel => personnel.id !== id))
-        })
+    if (window.confirm(`Are you sure you want to delete ${person.name}?`)) {
 
+      communicator
+        .remove(id)
+          .then(returnedPerson => {
+            setPersons(persons.filter(personnel => personnel.id !== id))
+          })
+
+      setNotification(`Deleted ${person.name}`)
+      setNotificationClass("good")
+
+      setTimeout(() => {
+        setNotification(null)
+        setNotificationClass(null)
+      }, 5000)
+
+    }
   }
 
   const personsToShow = filterName === ''
@@ -90,6 +131,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={notification} classed={notificationClass}/>
       <Filter filterName={filterName} handleChange={(event) => setFilterName(event.target.value)} />
       <h2>add a new</h2>
       <form onSubmit={addNote}>
