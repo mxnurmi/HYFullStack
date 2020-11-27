@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
+import { documentToPlainTextString } from '@contentful/rich-text-plain-text-renderer';
+
 
 const InfoCountry = ( {country} ) => {
   const [ weatherData, setWeatherData ] = useState([])

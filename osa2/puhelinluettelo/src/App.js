@@ -91,9 +91,15 @@ const App = () => {
         .create(noteObject)
           .then(returnedPerson => {
             setPersons(persons.concat(returnedPerson))
+            setNotification(`Added ${newName}`)
+            setNotificationClass("good")
         })
-      setNotification(`Added ${newName}`)
-      setNotificationClass("good")
+        .catch(error => {
+          setNotification(error.response.data)
+          setNotificationClass("good")
+          console.log(error.response.data)
+        })
+
 
       setTimeout(() => {
         setNotification(null)
