@@ -110,3 +110,22 @@ describe('return author with most blogs', () => {
         expect(listHelper.mostBlogs(listWithAllBlogs)).toEqual(compare2)
     })
 })
+
+describe('return author with most likes', () => {
+    test('if one item, return the only author and amount of likes', () => {
+        const compare1 = 
+            {
+                author: "Edsger W. Dijkstra",
+                likes: 5
+            }
+        expect(listHelper.mostLikes(listWithOneBlog)).toEqual(compare1)
+    })
+    test('if multiple blogs, return the first author with highest amount of likes (17 likes)', () => {
+        const compare2 = 
+            {
+                author: "Edsger W. Dijkstra",
+                likes: 17
+            }
+        expect(listHelper.mostLikes(listWithAllBlogs)).toEqual(compare2)
+    })
+})

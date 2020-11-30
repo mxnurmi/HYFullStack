@@ -22,27 +22,37 @@ const favoriteBlog = (blogs) => {
 }
 
 const mostBlogs = (blogs) => {
-
   blogAmounts = lodash.countBy(blogs, 'author')
   maximumBlogs = lodash.values(blogAmounts)
   maxBlog = lodash.max(maximumBlogs)
-  
-  // console.log(blogAmounts)
-  // console.log(maximumBlogs)
-  // console.log(maxBlog)
 
   for (const [key,value] of Object.entries(blogAmounts)) {
     if(value === maxBlog) {
-      // console.log(key, value)
       return {'author': key, 'blogs': value}
     }
   }
 
 }
 
+const mostLikes = (blogs) => {
+  var likes = []
+  allAuthors = blogs.map(el => el.author) 
+  uniqAuthors = lodash.uniq(allAuthors)
+  
+  for(i in uniqAuthors) {
+    const author = lodash.filter(blogs, ['author', uniqAuthors[i]])
+    const totalLikes = lodash.sumBy(author, 'likes')
+    x = {'author': uniqAuthors[i], 'likes': totalLikes}
+    likes.push(x)
+  }
+  returnable = lodash.maxBy(likes, 'likes')
+  return(returnable)
+}
+
 module.exports = {
   dummy,
   totalLikes,
   favoriteBlog,
-  mostBlogs
+  mostBlogs,
+  mostLikes
 }
