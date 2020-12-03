@@ -96,6 +96,34 @@ test('if blog does not contain title and url, return status 400 Bad request', as
         .expect(400)
 })
 
+test('blog can be deleted', async() => {
+
+    const newBlog = {     
+        _id: "5a422b891b54a676234d17fb", 
+        title: "Testing is for Pros", 
+        author: "Max Power", 
+        url: "https://testing.fi/", 
+        __v: 0 
+    }
+
+    await api 
+        .post('/api/blogs')
+        .send(newBlog)
+
+    const blogsInDBStart = await Blog.find({})
+    const blogsAtStart = blogsInDBStart.map(note => note.toJSON())
+
+    await api
+        .delete('/api/blogs/5a422b891b54a676234d17fb')
+        .expect(204)
+
+    const blogsInDBEnd = await Blog.find({})
+    const blogsAtEnd = blogsInDBEnd.map(note => note.toJSON())
+
+    expect(blogsAtEnd).toHaveLength(blogsAtStart.length - 1)
+
+})
+
 afterAll(() => {
   mongoose.connection.close()
 })
