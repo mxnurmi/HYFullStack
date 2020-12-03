@@ -79,9 +79,21 @@ test('if likes are undefined, set it to 0', async() => {
     const blogsInDB = await Blog.find({})
     blogsAtEnd = blogsInDB.map(note => note.toJSON())
     const resultBlog = blogsAtEnd.find(blog => blog.id === '5a422b891b54a676234d17fb')
-    console.log(resultBlog)
 
     expect(resultBlog.likes).toEqual(0)
+})
+
+test('if blog does not contain title and url, return status 400 Bad request', async() => {
+    const newBlog = {     
+        _id: "5a422b891b54a676234d17fb", 
+        author: "Max Power", 
+        __v: 0 
+    }
+
+    await api 
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(400)
 })
 
 afterAll(() => {
