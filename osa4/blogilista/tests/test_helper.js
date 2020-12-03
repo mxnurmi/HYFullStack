@@ -49,4 +49,13 @@ const listWithAllBlogs = [
     }
 ]
 
+const dummyBlog = {     
+    _id: "5a422444b54a676234d17f7", 
+    title: "Testing is for Pros", 
+    author: "Max Power", 
+    url: "https://testing.fi/", 
+    likes: 4, 
+    __v: 0 
+}
+
 module.exports = {listWithAllBlogs}

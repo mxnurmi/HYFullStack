@@ -14,13 +14,18 @@ blogRouter.get('/', async (request, response) => {
 })
   
 blogRouter.post('/', (request, response) => {
-    const blog = new Blog(request.body)
-  
-    blog
-      .save()
-      .then(result => {
-        response.status(201).json(result)
-    })
+
+  if(typeof request.body.likes === 'undefined') {
+    request.body.likes = 0
+  }
+
+  const blog = new Blog(request.body)
+
+  blog
+    .save()
+    .then(result => {
+      response.status(201).json(result)
+  })
 })
 
 module.exports = blogRouter
