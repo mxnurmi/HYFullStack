@@ -102,7 +102,8 @@ test('blog can be deleted', async() => {
         _id: "5a422b891b54a676234d17fb", 
         title: "Testing is for Pros", 
         author: "Max Power", 
-        url: "https://testing.fi/", 
+        url: "https://testing.fi/",
+        likes: 4, 
         __v: 0 
     }
 
@@ -121,7 +122,39 @@ test('blog can be deleted', async() => {
     const blogsAtEnd = blogsInDBEnd.map(note => note.toJSON())
 
     expect(blogsAtEnd).toHaveLength(blogsAtStart.length - 1)
+})
 
+test('blog is updated if new one is posted to used id', async() => {
+
+    const newBlog = {     
+        _id: "5a422b891b54a676234d17fb", 
+        title: "Testing is for Pros", 
+        author: "Max Power", 
+        url: "https://testing.fi/", 
+        likes: 4,
+        __v: 0 
+    }
+
+    await api 
+        .post('/api/blogs')
+        .send(newBlog)
+
+    const updatedBlog = {     
+        id: "5a422b891b54a676234d17fb", 
+        title: "Testing is for Yous", 
+        author: "Max Saver", 
+        url: "https://failing.fi/", 
+        likes: 10,
+        __v: 0 
+    }
+
+    await api 
+        .put('/api/blogs/5a422b891b54a676234d17fb')
+        .send(updatedBlog)
+
+    const allBlogs = await Blog.find({})
+    const authors = allBlogs.map(blog => blog.author)
+    expect(authors).toContain('Max Saver')
 })
 
 afterAll(() => {
