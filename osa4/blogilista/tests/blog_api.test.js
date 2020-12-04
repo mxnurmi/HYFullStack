@@ -3,6 +3,7 @@ const supertest = require('supertest')
 const app = require('../app')
 const helper = require('./test_helper')
 const Blog = require('../models/blog')
+const User = require('../models/user')
 const { notify } = require('../app')
 const test_helper = require('./test_helper')
 
@@ -11,6 +12,8 @@ const api = supertest(app)
 beforeEach(async () => {
     await Blog.deleteMany({})
     await Blog.insertMany(helper.listWithAllBlogs)
+
+    await User.deleteMany({})
 })
 
 test('notes are returned as json', async () => {
@@ -155,6 +158,51 @@ test('blog is updated if new one is posted to used id', async() => {
     const allBlogs = await Blog.find({})
     const authors = allBlogs.map(blog => blog.author)
     expect(authors).toContain('Max Saver')
+})
+
+describe('test that password and username are valid', () => {
+    test('cannot useinvalid username and get correct error', async () => {
+
+        const testUser1 = {
+            "username": "testaaja",
+            "name": "Pekka Testaaja",
+            "password": "sekret1"
+        }
+
+        await api 
+            .post('/api/users')
+            .send(testUser1)
+
+        const testUser2 = {
+            "username": "testaaja",
+            "name": "Pekka Pestaaja",
+            "password": "sekret2"
+        }
+
+        const result = await api 
+            .post('/api/users')
+            .send(testUser2)
+            .expect(400)
+        
+        expect(result.body.error).toContain('`username` to be unique')
+    }) 
+
+    test('cannot use a invalid password and get correct error', async () => {
+
+        const testUser = {
+            "username": "testaaja",
+            "name": "Pekka Testaaja",
+            "password": "12"
+        }
+
+        const result = await api 
+            .post('/api/users')
+            .send(testUser)
+            .expect(400)
+
+        expect(result.body.error).toContain('password is too short or undefined')
+    })
+
 })
 
 afterAll(() => {
