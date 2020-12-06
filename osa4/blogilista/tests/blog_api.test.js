@@ -8,12 +8,38 @@ const { notify } = require('../app')
 const test_helper = require('./test_helper')
 
 const api = supertest(app)
+var token = undefined
+var testUser = undefined
 
 beforeEach(async () => {
     await Blog.deleteMany({})
     await Blog.insertMany(helper.listWithAllBlogs)
 
     await User.deleteMany({})
+
+    testUser = {
+        "username": "admin",
+        "name": "",
+        "password": process.env.TEST_PASS,
+    }
+
+    await api
+        .post('/api/users')
+        .send(testUser)
+
+    const user = {
+        "username": "admin", 
+        "password": process.env.TEST_PASS
+    }
+
+    const login = await api
+        .post('/api/login')
+        .send(user)
+
+    token = JSON.parse(login.text).token
+    // token = login.response
+    // console.log(token)
+
 })
 
 test('notes are returned as json', async () => {
@@ -43,6 +69,7 @@ test('there is no field called _id', async () => {
 })
 
 test('a valid blog can be added to the data base', async() => {
+
     const newBlog = {     
         _id: "5a422b891b54a676234d17fb", 
         title: "Testing is for Pros", 
@@ -54,6 +81,7 @@ test('a valid blog can be added to the data base', async() => {
 
     await api 
         .post('/api/blogs')
+        .set('Authorization', `bearer ${token}`)
         .send(newBlog)
         .expect(201)
 
@@ -77,7 +105,9 @@ test('if likes are undefined, set it to 0', async() => {
 
     await api 
         .post('/api/blogs')
+        .set('Authorization', `bearer ${token}`)
         .send(newBlog)
+        .expect(201)
     
     const blogsInDB = await Blog.find({})
     blogsAtEnd = blogsInDB.map(note => note.toJSON())
@@ -95,6 +125,7 @@ test('if blog does not contain title and url, return status 400 Bad request', as
 
     await api 
         .post('/api/blogs')
+        .set('Authorization', `bearer ${token}`)
         .send(newBlog)
         .expect(400)
 })
@@ -112,6 +143,7 @@ test('blog can be deleted', async() => {
 
     await api 
         .post('/api/blogs')
+        .set('Authorization', `bearer ${token}`)
         .send(newBlog)
 
     const blogsInDBStart = await Blog.find({})
@@ -119,6 +151,7 @@ test('blog can be deleted', async() => {
 
     await api
         .delete('/api/blogs/5a422b891b54a676234d17fb')
+        .set('Authorization', `bearer ${token}`)
         .expect(204)
 
     const blogsInDBEnd = await Blog.find({})
@@ -140,6 +173,7 @@ test('blog is updated if new one is posted to used id', async() => {
 
     await api 
         .post('/api/blogs')
+        .set('Authorization', `bearer ${token}`)
         .send(newBlog)
 
     const updatedBlog = {     
@@ -203,6 +237,23 @@ describe('test that password and username are valid', () => {
         expect(result.body.error).toContain('password is too short or undefined')
     })
 
+})
+
+test('Get 401 if posting a blog without proper token', async () => {
+    const testBlog = {     
+        _id: "5a422b891b54a676234d17fb", 
+        title: "Testing is for Pros", 
+        author: "Max Power", 
+        url: "https://testing.fi/", 
+        likes: 4,
+        __v: 0 
+    }
+
+    const result = await api 
+        .post('/api/blogs')
+        .set('Authorization', 'bearer tamaonvaaratoken1234')
+        .send(testBlog)
+        .expect(401)
 })
 
 afterAll(() => {
