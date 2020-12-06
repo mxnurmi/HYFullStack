@@ -26,6 +26,8 @@ app.use(express.json())
 
 const logger = require('./utils/logger')
 
+app.use(middleware.tokenExtractor)
+
 app.use('/api/blogs', blogRouter)
 app.use('/api/users', usersRouter)
 app.use('/api/login', loginRouter)
