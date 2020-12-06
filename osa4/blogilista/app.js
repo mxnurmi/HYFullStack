@@ -8,6 +8,7 @@ const middleware = require('./utils/middleware')
 // const Blog = require('./models/blog')
 const usersRouter = require('./controllers/users')
 const blogRouter = require('./controllers/blogs')
+const loginRouter = require('./controllers/login')
 const mongoose = require('mongoose')
 
 const mongoUrl = config.MONGODB_URI
@@ -27,6 +28,7 @@ const logger = require('./utils/logger')
 
 app.use('/api/blogs', blogRouter)
 app.use('/api/users', usersRouter)
+app.use('/api/login', loginRouter)
 
 app.use(middleware.errorHandler)
 
