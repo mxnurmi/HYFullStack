@@ -3,26 +3,13 @@ import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import './App.css'
-
-// const AllBlogs = blogs => {
-//   console.log(blogs)
-//   return (
-//     <div>
-//       <h2>blogs</h2>
-//       {blogs.map(blog =>
-//         <Blog key={blog.id} blog={blog} />
-//       )}
-//     </div>
-//   )
-// }
+import Toggleable from './components/Toggleable'
+import BlogForm from './components/BlogForm'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('') 
   const [password, setPassword] = useState('') 
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
   const [user, setUser] = useState(null)
   const [notification, setNotification] = useState(null)
   const [notificationClass, setNotificationClass] = useState(null)
@@ -86,78 +73,62 @@ const App = () => {
     </div>      
   )
 
-  const addBlog = async (event) => {
-    event.preventDefault()
+  // const addBlog = async (event) => {
+  //   event.preventDefault()
 
+  //   blogService.setToken(user.token)
+
+  //   const blogObject = {
+  //     title: title,
+  //     author: author,
+  //     url: url
+  //   }
+
+  //   const response = await blogService.create(blogObject)
+  //   setBlogs(blogs.concat(response))
+
+  //   setNotification(`a new blog '${title}' by ${author} added`)
+  //   setNotificationClass("good")
+
+  //   setTimeout(() => {
+  //     setNotification(null)
+  //     setNotificationClass(null)
+  //   }, 5000)
+
+  //   setTitle('')
+  //   setAuthor('')
+  //   setUrl('')
+  // }
+
+  const createBlog = async (blogObject) => { 
     blogService.setToken(user.token)
-
-    const blogObject = {
-      title: title,
-      author: author,
-      url: url
-    }
-
     const response = await blogService.create(blogObject)
     setBlogs(blogs.concat(response))
 
-    setNotification(`a new blog '${title}' by ${author} added`)
+    setNotification(`a new blog '${blogObject.title}' by ${blogObject.author} added`)
     setNotificationClass("good")
 
     setTimeout(() => {
       setNotification(null)
       setNotificationClass(null)
     }, 5000)
-
-    setTitle('')
-    setAuthor('')
-    setUrl('')
   }
 
-  const blogForm = () => (
-    <div>
-      <h2>Blogs</h2>
-      <div className={notificationClass}>{notification}</div>
-      <p> {user.username} logged in {<button onClick={handleClick}>logout</button>}</p>
-      <h2>Create new</h2>
-
-      <form onSubmit={addBlog}>
+  const blogForm = () => {
+    return(
         <div>
-          title 
-            <input 
-            type="text" 
-            value={title} 
-            name="Title" 
-            onChange={({ target }) => setTitle(target.value)}
-          />
+          <h2>Blogs</h2>
+          <div className={notificationClass}>{notification}</div>
+          <p> {user.username} logged in {<button onClick={handleClick}>logout</button>}</p>
+          <Toggleable buttonLabel="Post blog">
+            <BlogForm createBlog={createBlog}/>
+          </Toggleable>
+          {blogs.map(blog =>
+            <Blog key={blog.id} blog={blog} />
+          )}
         </div>
-        <div>
-          author 
-            <input 
-            type="text" 
-            value={author} 
-            name="Author" 
-            onChange={({ target }) => setAuthor(target.value)}
-          />
-        </div>
-        <div>
-          url 
-            <input 
-            type="text" 
-            value={url} 
-            name="URL" 
-            onChange={({ target }) => setUrl(target.value)}
-          />
-        </div>
-        <div>
-          <button type="submit">create</button>
-        </div>
-      </form>
-
-      {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
-      )}
-    </div>
-  )
+      )
+    }
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
