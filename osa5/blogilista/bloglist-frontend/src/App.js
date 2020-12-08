@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
@@ -13,6 +13,8 @@ const App = () => {
   const [user, setUser] = useState(null)
   const [notification, setNotification] = useState(null)
   const [notificationClass, setNotificationClass] = useState(null)
+
+  const blogFormRef = useRef()
 
   const handleLogin = async (event) => {
     event.preventDefault()
@@ -73,33 +75,6 @@ const App = () => {
     </div>      
   )
 
-  // const addBlog = async (event) => {
-  //   event.preventDefault()
-
-  //   blogService.setToken(user.token)
-
-  //   const blogObject = {
-  //     title: title,
-  //     author: author,
-  //     url: url
-  //   }
-
-  //   const response = await blogService.create(blogObject)
-  //   setBlogs(blogs.concat(response))
-
-  //   setNotification(`a new blog '${title}' by ${author} added`)
-  //   setNotificationClass("good")
-
-  //   setTimeout(() => {
-  //     setNotification(null)
-  //     setNotificationClass(null)
-  //   }, 5000)
-
-  //   setTitle('')
-  //   setAuthor('')
-  //   setUrl('')
-  // }
-
   const createBlog = async (blogObject) => { 
     blogService.setToken(user.token)
     const response = await blogService.create(blogObject)
@@ -107,6 +82,8 @@ const App = () => {
 
     setNotification(`a new blog '${blogObject.title}' by ${blogObject.author} added`)
     setNotificationClass("good")
+
+    blogFormRef.current.toggleVisibility()
 
     setTimeout(() => {
       setNotification(null)
@@ -120,7 +97,7 @@ const App = () => {
           <h2>Blogs</h2>
           <div className={notificationClass}>{notification}</div>
           <p> {user.username} logged in {<button onClick={handleClick}>logout</button>}</p>
-          <Toggleable buttonLabel="Post blog">
+          <Toggleable buttonLabel="Post blog" ref={blogFormRef}>
             <BlogForm createBlog={createBlog}/>
           </Toggleable>
           {blogs.map(blog =>
