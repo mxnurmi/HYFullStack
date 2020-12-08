@@ -1,4 +1,5 @@
 import React, {useState} from 'react'
+import blogService from '../services/blogs'
 
 // let token = null
 
@@ -18,9 +19,23 @@ const blogStyle = {
 
 const Blog = ({ blog }) => {
 
-const [infoVisible, setInfoVisible] = useState(false)
-const showWhenTrue = { display: infoVisible ? '' : 'none' }
-const showWhenFalse = { display: infoVisible ? 'none' : '' }  
+  const [infoVisible, setInfoVisible] = useState(false)
+  // const [blog, setBlog] = useState(inputBlog)
+  const showWhenTrue = { display: infoVisible ? '' : 'none' }
+  const showWhenFalse = { display: infoVisible ? 'none' : '' }
+  const [blogLike, setLike] = useState(blog.likes)
+
+  const handleLike = async (blog) => { //tää pitäis ehkä toteuttaa ylempänä?
+    const updatedBlog = {
+      title: blog.title,
+      author: blog.author,
+      url: blog.url,
+      likes: blogLike + 1
+    }
+
+    const response = await blogService.put(blog.id, updatedBlog)
+    setLike(response.likes)
+  }
 
   return (
     <div style={blogStyle}>
@@ -30,7 +45,7 @@ const showWhenFalse = { display: infoVisible ? 'none' : '' }
       <div style={showWhenTrue}>
         <div>{blog.title} {blog.author} <button onClick={() => setInfoVisible(!infoVisible)}>hide</button> </div>
         <div>{blog.url}</div>
-        <div>likes {blog.likes} <button onClick={() => console.log('like')}>like</button> </div> 
+        <div>likes {blogLike} <button onClick={() => handleLike(blog)}>like</button> </div> 
         <div>{blog.user.username}</div>
       </div>
     </div>
