@@ -6,6 +6,19 @@ import './App.css'
 import Toggleable from './components/Toggleable'
 import BlogForm from './components/BlogForm'
 
+
+const MapBlogs = ({blogs, likeBlog}) => {
+
+  return(
+    <div>
+      {blogs.map(blog =>
+        <Blog key={blog.id} blog={blog} likeBlog={likeBlog} />
+      )}
+    </div>
+  )
+
+}
+
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('') 
@@ -91,6 +104,23 @@ const App = () => {
     }, 5000)
   }
 
+  const likeBlog = (id) => async () => {
+    const blog = blogs.find(blog => blog.id === id)
+
+    const newBlog = {
+      ...blog,
+      likes: blog.likes + 1,
+      user: blog.user
+    }
+
+    const response = await blogService.put(id, newBlog)
+    // console.log(response)
+    const results = blogs.map(blog => blog.id !== response.id ? blog : newBlog)
+    const sortedBlogs = results.sort((a,b) => b.likes - a.likes)
+    setBlogs(sortedBlogs)
+
+  }
+
   const blogForm = () => {
     return(
         <div>
@@ -100,16 +130,15 @@ const App = () => {
           <Toggleable buttonLabel="Post blog" ref={blogFormRef}>
             <BlogForm createBlog={createBlog}/>
           </Toggleable>
-          {blogs.map(blog =>
-            <Blog key={blog.id} blog={blog} />
-          )}
+          {/* <button onClick={() => sortBlogs()}> Sort </button> */}
+          <MapBlogs blogs={blogs} likeBlog={likeBlog}/>
         </div>
       )
-    }
+  }
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
-      setBlogs( blogs )
+      setBlogs( blogs.sort((a,b) => b.likes - a.likes) )
     )  
   }, [])
 
