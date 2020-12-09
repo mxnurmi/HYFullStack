@@ -17,11 +17,12 @@ const blogStyle = {
   marginBottom: 5
 }
 
-const Blog = ({ blog, likeBlog }) => {
+const Blog = ({ blog, likeBlog, deleteBlog, user }) => {
 
   const [infoVisible, setInfoVisible] = useState(false)
   const showWhenTrue = { display: infoVisible ? '' : 'none' }
   const showWhenFalse = { display: infoVisible ? 'none' : '' }
+  const userExists = { display: user.username === blog.user.username ? '' : 'none'}
 
   return (
     <div style={blogStyle}>
@@ -33,6 +34,8 @@ const Blog = ({ blog, likeBlog }) => {
         <div>{blog.url}</div>
         <div>likes {blog.likes} <button onClick={likeBlog(blog.id)}>like</button> </div> 
         <div>{blog.user.username}</div>
+        <div style={userExists}> <button onClick={deleteBlog(blog.id)}>delete</button> </div>
+
       </div>
     </div>
   )

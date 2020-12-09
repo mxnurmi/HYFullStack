@@ -7,16 +7,14 @@ import Toggleable from './components/Toggleable'
 import BlogForm from './components/BlogForm'
 
 
-const MapBlogs = ({blogs, likeBlog}) => {
-
+const MapBlogs = ({ blogs, likeBlog, deleteBlog, user }) => {
   return(
     <div>
       {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} likeBlog={likeBlog} />
+        <Blog key={blog.id} blog={blog} likeBlog={likeBlog} deleteBlog={deleteBlog} user={user} />
       )}
     </div>
   )
-
 }
 
 const App = () => {
@@ -104,6 +102,17 @@ const App = () => {
     }, 5000)
   }
 
+  const deleteBlog = (id) => async () => {
+    blogService.setToken(user.token)
+    const blog = blogs.find(blog => blog.id === id)
+
+    if (window.confirm(`Are you sure you want to delete blog ${blog.title} by ${blog.author}?`)) {
+      await blogService.remove(id)
+      setBlogs(blogs.filter(el => el.id !== blog.id))
+    }
+
+  }
+
   const likeBlog = (id) => async () => {
     const blog = blogs.find(blog => blog.id === id)
 
@@ -131,7 +140,7 @@ const App = () => {
             <BlogForm createBlog={createBlog}/>
           </Toggleable>
           {/* <button onClick={() => sortBlogs()}> Sort </button> */}
-          <MapBlogs blogs={blogs} likeBlog={likeBlog}/>
+          <MapBlogs blogs={blogs} likeBlog={likeBlog} deleteBlog={deleteBlog} user={user}/>
         </div>
       )
   }
