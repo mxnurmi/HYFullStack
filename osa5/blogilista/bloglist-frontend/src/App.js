@@ -89,8 +89,8 @@ const App = () => {
   const createBlog = async (blogObject) => { 
     blogService.setToken(user.token)
     const response = await blogService.create(blogObject)
+    response.user = user
     setBlogs(blogs.concat(response))
-
     setNotification(`a new blog '${blogObject.title}' by ${blogObject.author} added`)
     setNotificationClass("good")
 
