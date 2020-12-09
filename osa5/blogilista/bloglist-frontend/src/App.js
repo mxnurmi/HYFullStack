@@ -19,8 +19,8 @@ const MapBlogs = ({ blogs, likeBlog, deleteBlog, user }) => {
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
-  const [username, setUsername] = useState('') 
-  const [password, setPassword] = useState('') 
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
   const [notification, setNotification] = useState(null)
   const [notificationClass, setNotificationClass] = useState(null)
@@ -29,7 +29,7 @@ const App = () => {
 
   const handleLogin = async (event) => {
     event.preventDefault()
-    
+
     try {
       const user = await loginService.login({
         username, password,
@@ -40,12 +40,12 @@ const App = () => {
 
       window.localStorage.setItem(
         'loggedBlogAppUser', JSON.stringify(user)
-      ) 
+      )
 
     } catch (exception) {
       setNotification('bad username or password')
-      setNotificationClass("bad")
-      
+      setNotificationClass('bad')
+
       setTimeout(() => {
         setNotification(null)
         setNotificationClass(null)
@@ -64,8 +64,8 @@ const App = () => {
       <div className={notificationClass}>{notification}</div>
       <form onSubmit={handleLogin}>
         <div>
-          username 
-            <input
+          username
+          <input
             type="text"
             value={username}
             name="Username"
@@ -73,8 +73,8 @@ const App = () => {
           />
         </div>
         <div>
-          password 
-            <input
+          password
+          <input
             type="password"
             value={password}
             name="Password"
@@ -83,16 +83,16 @@ const App = () => {
         </div>
         <button type="submit">login</button>
       </form>
-    </div>      
+    </div>
   )
 
-  const createBlog = async (blogObject) => { 
+  const createBlog = async (blogObject) => {
     blogService.setToken(user.token)
     const response = await blogService.create(blogObject)
     response.user = user
     setBlogs(blogs.concat(response))
     setNotification(`a new blog '${blogObject.title}' by ${blogObject.author} added`)
-    setNotificationClass("good")
+    setNotificationClass('good')
 
     blogFormRef.current.toggleVisibility()
 
@@ -132,23 +132,23 @@ const App = () => {
 
   const blogForm = () => {
     return(
-        <div>
-          <h2>Blogs</h2>
-          <div className={notificationClass}>{notification}</div>
-          <p> {user.username} logged in {<button onClick={handleClick}>logout</button>}</p>
-          <Toggleable buttonLabel="Post blog" ref={blogFormRef}>
-            <BlogForm createBlog={createBlog}/>
-          </Toggleable>
-          {/* <button onClick={() => sortBlogs()}> Sort </button> */}
-          <MapBlogs blogs={blogs} likeBlog={likeBlog} deleteBlog={deleteBlog} user={user}/>
-        </div>
-      )
+      <div>
+        <h2>Blogs</h2>
+        <div className={notificationClass}>{notification}</div>
+        <p> {user.username} logged in {<button onClick={handleClick}>logout</button>}</p>
+        <Toggleable buttonLabel="Post blog" ref={blogFormRef}>
+          <BlogForm createBlog={createBlog}/>
+        </Toggleable>
+        {/* <button onClick={() => sortBlogs()}> Sort </button> */}
+        <MapBlogs blogs={blogs} likeBlog={likeBlog} deleteBlog={deleteBlog} user={user}/>
+      </div>
+    )
   }
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
       setBlogs( blogs.sort((a,b) => b.likes - a.likes) )
-    )  
+    )
   }, [])
 
   useEffect(() => {

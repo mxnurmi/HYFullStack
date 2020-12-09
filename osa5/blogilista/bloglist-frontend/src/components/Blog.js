@@ -1,4 +1,5 @@
-import React, {useState} from 'react'
+import React, { useState } from 'react'
+import PropTypes from 'prop-types'
 // import blogService from '../services/blogs'
 
 // let token = null
@@ -22,7 +23,7 @@ const Blog = ({ blog, likeBlog, deleteBlog, user }) => {
   const [infoVisible, setInfoVisible] = useState(false)
   const showWhenTrue = { display: infoVisible ? '' : 'none' }
   const showWhenFalse = { display: infoVisible ? 'none' : '' }
-  const userExists = { display: user.username === blog.user.username ? '' : 'none'}
+  const userExists = { display: user.username === blog.user.username ? '' : 'none' }
 
   return (
     <div style={blogStyle}>
@@ -32,13 +33,17 @@ const Blog = ({ blog, likeBlog, deleteBlog, user }) => {
       <div style={showWhenTrue}>
         <div>{blog.title} {blog.author} <button onClick={() => setInfoVisible(!infoVisible)}>hide</button> </div>
         <div>{blog.url}</div>
-        <div>likes {blog.likes} <button onClick={likeBlog(blog.id)}>like</button> </div> 
+        <div>likes {blog.likes} <button onClick={likeBlog(blog.id)}>like</button> </div>
         <div>{blog.user.username}</div>
         <div style={userExists}> <button onClick={deleteBlog(blog.id)}>delete</button> </div>
 
       </div>
     </div>
   )
+}
+
+Blog.propTypes = {
+  blog: PropTypes.object.isRequired
 }
 
 export default Blog
