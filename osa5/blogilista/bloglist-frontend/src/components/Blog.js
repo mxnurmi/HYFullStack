@@ -26,7 +26,7 @@ const Blog = ({ blog, likeBlog, deleteBlog, user }) => {
   const userExists = { display: user.username === blog.user.username ? '' : 'none' }
 
   return (
-    <div style={blogStyle}>
+    <div style={blogStyle} className='blog'>
       <div style={showWhenFalse}>
         {blog.title} {blog.author} <button onClick={() => setInfoVisible(!infoVisible)}>view</button>
       </div>
