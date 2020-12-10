@@ -37,7 +37,7 @@ test('Blog component only renders title and author by default, no url or likes',
 
 })
 
-test('After a click, all components are visible', async () => {
+test('After a click on view button, all components are visible', async () => {
   const mockHandler1 = jest.fn()
   const mockHandler2 = jest.fn()
 
@@ -69,3 +69,32 @@ test('After a click, all components are visible', async () => {
   expect(component.getByText(/10/)).toBeVisible()
 
 })
+
+test('After a click of like button, the event handler is called properly', async () => {
+  const mockHandler = jest.fn()
+
+  const useri = {
+    username: 'Test',
+    name: 'Testaaja Pertti'
+  }
+
+  const blog = {
+    id: 121,
+    title: 'titteli',
+    author: 'Kirjoittaja',
+    url: 'www.sosoite.net',
+    likes: 0,
+    user: useri
+  }
+
+  const component = render(
+    <Blog blog={blog} user={useri} likeBlog={() => mockHandler} deleteBlog={() => console.log('')}/>
+  )
+
+  const button = component.getByText('Like')
+  fireEvent.click(button)
+  fireEvent.click(button)
+
+  expect(mockHandler.mock.calls).toHaveLength(2)
+})
+
