@@ -3,6 +3,7 @@ import React from 'react'
 // import { voteAnecdote } from './reducers/anecdoteReducer'
 import NewAnecdote from './components/anecdoteForm'
 import Anecdotes from './components/anecdoteList'
+import Notification from './components/Notification'
 
 const App = () => {
   // const vote = (id) => {
@@ -11,6 +12,7 @@ const App = () => {
 
   return (
     <div>
+      <Notification />
       <Anecdotes />
       <NewAnecdote />
     </div>
