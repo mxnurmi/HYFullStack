@@ -34,8 +34,9 @@ export const createAnecdote = (content) => {
     }
   }
 }
- 
-const initialState = anecdotesAtStart.map(asObject)
+
+const sortedAnecdotes = anecdotesAtStart.sort((a, b) => a.votes - b.votes)
+const initialState = sortedAnecdotes.map(asObject)
 
 const reducer = (state = initialState, action) => {
   switch(action.type) {
@@ -46,7 +47,9 @@ const reducer = (state = initialState, action) => {
       ...aneToChange,
       votes: aneToChange.votes + 1
     }
-    return state.map(ane => ane.id !== id ? ane : newAne)
+
+    const anecdotes = state.map(ane => ane.id !== id ? ane : newAne)
+    return anecdotes.sort((a, b) => b.votes - a.votes)
 
   case "NEW_ANE":
     return [...state, action.data]
