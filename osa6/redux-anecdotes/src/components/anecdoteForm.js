@@ -7,7 +7,6 @@ const NewAnecdote = () => {
 
     const addAne = (event) => {
         event.preventDefault()
-        event.preventDefault()
         const content = event.target.ane.value
         event.target.ane.value = ''
         dispatch(createAnecdote(content))
