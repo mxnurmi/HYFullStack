@@ -85,14 +85,17 @@ let books = [
 
 const typeDefs = gql`
     type Book {
-        title: String,
+        title: String!,
         author: String,
+        published: Int,
+        genres: [String!],
         id: ID!
     }
 
   type Query {
       bookCount: Int!
       authorCount: Int!
+      allBooks: [Book!]!
   }
 `
 
@@ -103,7 +106,8 @@ const resolvers = {
         const onlyAuthors = books.map(el => el.author)
         let uniqueItems = [...new Set(onlyAuthors)]
         return uniqueItems.length
-    }
+    },
+      allBooks: () => books
   }
 }
 
